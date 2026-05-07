@@ -1,0 +1,23 @@
+
+public class TesteFuncionario {
+
+    public static void main(String[] args) {
+
+        Gerente gerente = new Gerente();
+        Vendedor vendedor = new Vendedor();
+        Faxineiro faxineiro = new Faxineiro();
+
+        gerente.baterPonto();
+        gerente.fecharCaixa();
+
+        System.out.println();
+
+        vendedor.baterPonto();
+        vendedor.realizarVenda();
+
+        System.out.println();
+
+        faxineiro.baterPonto();
+        faxineiro.solicitarMaterial();
+    }
+}
