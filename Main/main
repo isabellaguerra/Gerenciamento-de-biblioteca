@@ -1,0 +1,111 @@
+import model.Livro;
+import service.BibliotecaService;
+
+import java.util.List;
+import java.util.Scanner;
+
+public class Main {
+    private static final BibliotecaService service = new BibliotecaService();
+    private static final Scanner scanner = new Scanner(System.class);
+
+    public static void main(String[] args) {
+        while (true) {
+            exibirMenu();
+            System.out.print("Escolha uma opção: ");
+            String opcao = scanner.nextLine().trim();
+
+            switch (opcao) {
+                case "1" -> cadastrarLivro();
+                case "2" -> cadastrarUsuario();
+                case "3" -> buscarLivros();
+                case "4" -> realizarEmprestimo();
+                case "5" -> realizarDevolucao();
+                case "6" -> exibirPendencias();
+                case "0" -> {
+                    System.out.println("\nEncerrando o sistema com segurança. Dados salvos!");
+                    return;
+                }
+                default -> System.out.println("❌ Opção inválida!");
+            }
+            System.out.println("\nPressione Enter para continuar...");
+            scanner.nextLine();
+        }
+    }
+
+    private static void exibirMenu() {
+        System.out.println("\n=============================================");
+        System.out.println("      📚 SISTEMA DE BIBLIOTECA (JAVA)        ");
+        System.out.println("=============================================");
+        System.out.println("1. Cadastrar Livro");
+        System.out.println("2. Cadastrar Membro/Usuário");
+        System.out.println("3. Buscar Livros");
+        System.out.println("4. Realizar Empréstimo");
+        System.out.println("5. Realizar Devolução");
+        System.out.println("6. Relatório de Pendências");
+        System.out.println("0. Sair");
+        System.out.println("=============================================");
+    }
+
+    private static void cadastrarLivro() {
+        System.out.println("--- CADASTRO DE LIVRO ---");
+        System.out.print("Título: "); String t = scanner.nextLine();
+        System.out.print("Autor: "); String a = scanner.nextLine();
+        System.out.print("ISBN: "); String i = scanner.nextLine();
+        System.out.print("Quantidade de cópias: ");
+        try {
+            int q = Integer.parseInt(scanner.nextLine());
+            System.out.println(service.cadastrarLivro(t, a, i, q));
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Erro: Quantidade deve ser um número inteiro.");
+        }
+    }
+
+    private static void cadastrarUsuario() {
+        System.out.println("--- CADASTRO DE MEMBRO ---");
+        System.out.print("ID (CPF ou Matrícula): "); String id = scanner.nextLine();
+        System.out.print("Nome: "); String nome = scanner.nextLine();
+        System.out.print("E-mail: "); String email = scanner.nextLine();
+        if (service.cadastrarUsuario(id, nome, email)) {
+            System.out.println("✅ Usuário cadastrado com sucesso!");
+        } else {
+            System.out.println("❌ Erro: ID já cadastrado.");
+        }
+    }
+
+    private static void buscarLivros() {
+        System.out.println("--- BUSCA DE LIVROS ---");
+        System.out.print("Digite o título, autor ou ISBN: ");
+        String termo = scanner.nextLine();
+        List<Livro> resultados = service.buscarLivros(termo);
+        if (resultados.isEmpty()) {
+            System.out.println("❌ Nenhum livro encontrado.");
+        } else {
+            resultados.forEach(l -> System.out.printf("- %s | Autor: %s | ISBN: %s | Disponível: %d/%d\n",
+                    l.getTitulo(), l.getAutor(), l.getIsbn(), l.getCopiasDisponiveis(), l.getTotalCopias()));
+        }
+    }
+
+    private static void realizarEmprestimo() {
+        System.out.println("--- REALIZAR EMPRÉSTIMO ---");
+        System.out.print("ID do Usuário: "); String id = scanner.nextLine();
+        System.out.print("ISBN do Livro: "); String isbn = scanner.nextLine();
+        System.out.println(service.realizarEmprestimo(isbn, id));
+    }
+
+    private static void realizarDevolucao() {
+        System.out.println("--- REALIZAR DEVOLUÇÃO ---");
+        System.out.print("ID do Usuário: "); String id = scanner.nextLine();
+        System.out.print("ISBN do Livro: "); String isbn = scanner.nextLine();
+        System.out.println(service.realizarDevolucao(isbn, id));
+    }
+
+    private static void exibirPendencias() {
+        System.out.println("--- RELATÓRIO DE PENDÊNCIAS (ATRASOS) ---");
+        List<String> pendencias = service.obterPendencias();
+        if (pendencias.isEmpty()) {
+            System.out.println("✅ Tudo em dia! Nenhuma pendência encontrada.");
+        } else {
+            pendencias.forEach(System.out.println);
+        }
+    }
+}
